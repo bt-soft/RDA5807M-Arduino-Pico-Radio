@@ -13,6 +13,7 @@ Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, 3, 2, TFT_RST);
 #define ST77XX_LIGHTGRAY 0xC618
 #define ST77XX_DARKGRAY 0x7BEF
 #define ST77XX_DARKCYAN 0x03EF
+#define ST77XX_PURPLE 0xF81F
 
 // Text méretek:
 // 1: 6x8 (default)
@@ -84,27 +85,27 @@ int scrollPosition = 0;
 /**
  * Clear RDS information
  */
-#line 85 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
+#line 86 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 void clearRds();
-#line 102 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
+#line 106 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 void checkRDS();
-#line 120 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
+#line 124 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 void radioSeek();
-#line 135 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
+#line 139 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 void displayFrequency();
-#line 148 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
+#line 152 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 void displayInit();
-#line 179 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
+#line 183 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 void displayData();
-#line 288 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
+#line 292 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 void rotaryController(RotaryEncoder::Button buttonState, RotaryEncoder::Direction direction);
-#line 322 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
+#line 326 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 bool HardwareTimerHandler1(struct repeating_timer *t);
-#line 330 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
+#line 334 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 void setup();
-#line 370 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
+#line 374 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 void loop();
-#line 85 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
+#line 86 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 void clearRds() {
     rdsProgramType = -1;
     pProgramInfo = NULL;
@@ -112,9 +113,12 @@ void clearRds() {
     pRdsTime = NULL;
 
     // ELőző RSD értékek törlése
-    prevStationName[0] = 255;
-    prevProgramInfo[0] = 255;
-    prevRdsTime[0] = 255;
+    memset(prevStationName, 0, sizeof(prevStationName));
+    prevStationName[0] = 255; // beállítjuk a tömb első elemét 255-re, hogy ezt mi töröltük
+    memset(prevProgramInfo, 0, sizeof(prevProgramInfo));
+    prevProgramInfo[0] = 255; // beállítjuk a tömb első elemét 255-re, hogy ezt mi töröltük
+    memset(prevRdsTime, 0, sizeof(prevRdsTime));
+    prevRdsTime[0] = 255; // beállítjuk a tömb első elemét 255-re, hogy ezt mi töröltük
 
     prevRdsProgramType = -1;
 }
@@ -157,11 +161,11 @@ void radioSeek() {
  */
 void displayFrequency() {
 #define TXT_FREQUENCY_COL 10
-#define TXT_FREQUENCY_ROW 30
+#define TXT_FREQUENCY_ROW 20
     // tft.fillRect(TXT_FREQUENCY_COL, TXT_FREQUENCY_ROW, 100, TEXT_SIZE_3_HEIGHT, ST77XX_BLACK); // korábbi adatok törlése
     tft.setTextSize(3);
     tft.setCursor(TXT_FREQUENCY_COL, TXT_FREQUENCY_ROW);
-    tft.setTextColor(ST77XX_YELLOW, ST77XX_BLACK);
+    tft.setTextColor(ST77XX_PURPLE, ST77XX_BLACK);
     tft.print(radio.getFrequency() / 100.0, 1);
 }
 
@@ -189,7 +193,7 @@ void displayInit() {
     tft.print(F("RDS"));
 
     tft.setTextColor(ST77XX_LIGHTGRAY, ST77XX_BLACK);
-    tft.setCursor(110, TXT_FREQUENCY_ROW + 16);
+    tft.setCursor(110, TXT_FREQUENCY_ROW + 10);
     tft.print(F("MHz"));
 
     tft.drawFastHLine(0, 10, tft.width(), ST77XX_DARKCYAN);
@@ -292,7 +296,7 @@ void displayData() {
         }
 
 // Program Type kiírása
-#define TXT_PROGRAM_TYPE_ROW 110
+#define TXT_PROGRAM_TYPE_ROW 90
         if (rdsProgramType != prevRdsProgramType) {
             tft.fillRect(0, TXT_PROGRAM_TYPE_ROW, tft.width(), TEXT_SIZE_1_HEIGHT, ST77XX_BLACK); // Korábbi adatok törlése
             tft.setTextSize(1);

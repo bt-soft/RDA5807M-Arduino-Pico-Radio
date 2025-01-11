@@ -11,6 +11,7 @@ Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, 3, 2, TFT_RST);
 #define ST77XX_LIGHTGRAY 0xC618
 #define ST77XX_DARKGRAY 0x7BEF
 #define ST77XX_DARKCYAN 0x03EF
+#define ST77XX_PURPLE 0xF81F
 
 // Text méretek:
 // 1: 6x8 (default)
@@ -89,9 +90,12 @@ void clearRds() {
     pRdsTime = NULL;
 
     // ELőző RSD értékek törlése
-    prevStationName[0] = 255;
-    prevProgramInfo[0] = 255;
-    prevRdsTime[0] = 255;
+    memset(prevStationName, 0, sizeof(prevStationName));
+    prevStationName[0] = 255; // beállítjuk a tömb első elemét 255-re, hogy ezt mi töröltük
+    memset(prevProgramInfo, 0, sizeof(prevProgramInfo));
+    prevProgramInfo[0] = 255; // beállítjuk a tömb első elemét 255-re, hogy ezt mi töröltük
+    memset(prevRdsTime, 0, sizeof(prevRdsTime));
+    prevRdsTime[0] = 255; // beállítjuk a tömb első elemét 255-re, hogy ezt mi töröltük
 
     prevRdsProgramType = -1;
 }
@@ -134,11 +138,11 @@ void radioSeek() {
  */
 void displayFrequency() {
 #define TXT_FREQUENCY_COL 10
-#define TXT_FREQUENCY_ROW 30
+#define TXT_FREQUENCY_ROW 20
     // tft.fillRect(TXT_FREQUENCY_COL, TXT_FREQUENCY_ROW, 100, TEXT_SIZE_3_HEIGHT, ST77XX_BLACK); // korábbi adatok törlése
     tft.setTextSize(3);
     tft.setCursor(TXT_FREQUENCY_COL, TXT_FREQUENCY_ROW);
-    tft.setTextColor(ST77XX_YELLOW, ST77XX_BLACK);
+    tft.setTextColor(ST77XX_PURPLE, ST77XX_BLACK);
     tft.print(radio.getFrequency() / 100.0, 1);
 }
 
@@ -166,7 +170,7 @@ void displayInit() {
     tft.print(F("RDS"));
 
     tft.setTextColor(ST77XX_LIGHTGRAY, ST77XX_BLACK);
-    tft.setCursor(110, TXT_FREQUENCY_ROW + 16);
+    tft.setCursor(110, TXT_FREQUENCY_ROW + 10);
     tft.print(F("MHz"));
 
     tft.drawFastHLine(0, 10, tft.width(), ST77XX_DARKCYAN);
@@ -269,7 +273,7 @@ void displayData() {
         }
 
 // Program Type kiírása
-#define TXT_PROGRAM_TYPE_ROW 110
+#define TXT_PROGRAM_TYPE_ROW 90
         if (rdsProgramType != prevRdsProgramType) {
             tft.fillRect(0, TXT_PROGRAM_TYPE_ROW, tft.width(), TEXT_SIZE_1_HEIGHT, ST77XX_BLACK); // Korábbi adatok törlése
             tft.setTextSize(1);
