@@ -97,13 +97,13 @@ void displayFrequency();
 void displayInit();
 #line 183 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 void displayData();
-#line 292 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
+#line 293 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 void rotaryController(RotaryEncoder::Button buttonState, RotaryEncoder::Direction direction);
-#line 326 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
+#line 327 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 bool HardwareTimerHandler1(struct repeating_timer *t);
-#line 334 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
+#line 335 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 void setup();
-#line 374 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
+#line 375 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 void loop();
 #line 86 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 void clearRds() {
@@ -274,15 +274,16 @@ void displayData() {
         } else if (strlen(prevProgramInfo) > TXT_PROGRAM_INFO_WIDTH) {
             // Görgetés megvalósítása
             tft.setCursor(0, TXT_PROGRAM_INFO_ROW);
-            if (scrollPosition < strlen(prevProgramInfo) - TXT_PROGRAM_INFO_WIDTH) {
-                tft.print(prevProgramInfo + scrollPosition);
-                scrollPosition++;
-            } else {
-                // Szöveg úszása a jobb oldalról
-                int offset = scrollPosition - (strlen(prevProgramInfo) - TXT_PROGRAM_INFO_WIDTH);
-                tft.print(prevProgramInfo + offset);
-                tft.setCursor(tft.width() - (offset * TEXT_SIZE_1_WIDTH), TXT_PROGRAM_INFO_ROW);
-                tft.print(prevProgramInfo + offset);
+            if (scrollPosition < strlen(prevProgramInfo) + TXT_PROGRAM_INFO_WIDTH) {
+                if (scrollPosition < strlen(prevProgramInfo) - TXT_PROGRAM_INFO_WIDTH) {
+                    tft.print(prevProgramInfo + scrollPosition);
+                } else {
+                    // Szöveg úszása a jobb oldalról
+                    int offset = scrollPosition - (strlen(prevProgramInfo) - TXT_PROGRAM_INFO_WIDTH);
+                    tft.print(prevProgramInfo + offset);
+                    tft.setCursor(tft.width() - (offset * TEXT_SIZE_1_WIDTH), TXT_PROGRAM_INFO_ROW);
+                    tft.print(prevProgramInfo + offset);
+                }
                 scrollPosition++;
                 if (scrollPosition >= strlen(prevProgramInfo) + TXT_PROGRAM_INFO_WIDTH) {
                     scrollPosition = 0; // Reset scroll position when end is reached
@@ -397,7 +398,7 @@ void setup() {
 void loop() {
 
     static unsigned long prevDisplay = millis(); // Az aktuális idő lekérése
-    if (millis() - prevDisplay >= 100) {
+    if (millis() - prevDisplay >= 50) {
         displayData();
 
         //     Serial.printf("Date: %04d-%02d-%02d, Time: %02d:%02d:%02d\n\r",

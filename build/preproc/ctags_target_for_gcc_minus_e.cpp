@@ -312,15 +312,16 @@ void displayData() {
         } else if (strlen(prevProgramInfo) > (tft.width() / 6)) {
             // Görgetés megvalósítása
             tft.setCursor(0, 80);
-            if (scrollPosition < strlen(prevProgramInfo) - (tft.width() / 6)) {
-                tft.print(prevProgramInfo + scrollPosition);
-                scrollPosition++;
-            } else {
-                // Szöveg úszása a jobb oldalról
-                int offset = scrollPosition - (strlen(prevProgramInfo) - (tft.width() / 6));
-                tft.print(prevProgramInfo + offset);
-                tft.setCursor(tft.width() - (offset * 6), 80);
-                tft.print(prevProgramInfo + offset);
+            if (scrollPosition < strlen(prevProgramInfo) + (tft.width() / 6)) {
+                if (scrollPosition < strlen(prevProgramInfo) - (tft.width() / 6)) {
+                    tft.print(prevProgramInfo + scrollPosition);
+                } else {
+                    // Szöveg úszása a jobb oldalról
+                    int offset = scrollPosition - (strlen(prevProgramInfo) - (tft.width() / 6));
+                    tft.print(prevProgramInfo + offset);
+                    tft.setCursor(tft.width() - (offset * 6), 80);
+                    tft.print(prevProgramInfo + offset);
+                }
                 scrollPosition++;
                 if (scrollPosition >= strlen(prevProgramInfo) + (tft.width() / 6)) {
                     scrollPosition = 0; // Reset scroll position when end is reached
@@ -352,7 +353,7 @@ void displayData() {
  * Rotary encoder controller
 
  */
-# 292 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
+# 293 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 void rotaryController(RotaryEncoder::Button buttonState, RotaryEncoder::Direction direction) {
 
     switch (buttonState) {
@@ -389,7 +390,7 @@ void rotaryController(RotaryEncoder::Button buttonState, RotaryEncoder::Directio
  * Hardware timer interrupt service routine
 
  */
-# 326 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
+# 327 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 bool HardwareTimerHandler1(struct repeating_timer *t) {
     pRotaryEncoder->service();
     return true;
@@ -400,7 +401,7 @@ bool HardwareTimerHandler1(struct repeating_timer *t) {
  * Setup
 
  */
-# 334 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
+# 335 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 void setup() {
     Serial.begin(115200);
 
@@ -443,11 +444,11 @@ void setup() {
  * Loop
 
  */
-# 374 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
+# 375 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 void loop() {
 
     static unsigned long prevDisplay = millis(); // Az aktuális idő lekérése
-    if (millis() - prevDisplay >= 100) {
+    if (millis() - prevDisplay >= 50) {
         displayData();
 
         //     Serial.printf("Date: %04d-%02d-%02d, Time: %02d:%02d:%02d\n\r",
