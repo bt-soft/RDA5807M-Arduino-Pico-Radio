@@ -1,0 +1,12 @@
+#line 1 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\.vscode\\settings.json"
+{
+    "files.associations": {
+        "memory": "cpp",
+        "format": "cpp",
+        "functional": "cpp",
+        "ostream": "cpp",
+        "cstdint": "cpp",
+        "compare": "cpp",
+        "cstdlib": "cpp"
+    }
+}
