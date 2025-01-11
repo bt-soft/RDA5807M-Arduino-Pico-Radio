@@ -96,13 +96,13 @@ void displayFrequency();
 void displayInit();
 #line 179 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 void displayData();
-#line 289 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
+#line 288 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 void rotaryController(RotaryEncoder::Button buttonState, RotaryEncoder::Direction direction);
-#line 323 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
+#line 322 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 bool HardwareTimerHandler1(struct repeating_timer *t);
-#line 331 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
+#line 330 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 void setup();
-#line 371 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
+#line 370 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 void loop();
 #line 85 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 void clearRds() {
@@ -201,6 +201,8 @@ void displayInit() {
  */
 void displayData() {
 
+    tft.setTextSize(1);
+
 // RSSI érték kiírása
 #define RSSI_X 30
     int currentRssi = radio.getRssi();
@@ -255,20 +257,18 @@ void displayData() {
 // ProgramInfo kiírása
 #define TXT_PROGRAM_INFO_ROW 80
 #define TXT_PROGRAM_INFO_WIDTH (tft.width() / TEXT_SIZE_1_WIDTH)
+        tft.setTextSize(1);
         if (prevProgramInfo[0] == 255) {
             tft.fillRect(0, TXT_PROGRAM_INFO_ROW, tft.width(), TEXT_SIZE_1_HEIGHT, ST77XX_BLACK); // Korábbi adatok törlése
             prevProgramInfo[0] = 0;
         } else if (pProgramInfo != NULL && strcmp(pProgramInfo, prevProgramInfo) != 0) {
             tft.fillRect(0, TXT_PROGRAM_INFO_ROW, tft.width(), TEXT_SIZE_1_HEIGHT, ST77XX_BLACK); // Korábbi adatok törlése
-            tft.setTextSize(1);
             tft.setCursor(0, TXT_PROGRAM_INFO_ROW);
             tft.print(pProgramInfo);
             strncpy(prevProgramInfo, pProgramInfo, sizeof(prevProgramInfo) - 1);
             scrollPosition = 0; // Reset scroll position when new info is received
         } else if (strlen(prevProgramInfo) > TXT_PROGRAM_INFO_WIDTH) {
             // Görgetés megvalósítása
-            tft.fillRect(0, TXT_PROGRAM_INFO_ROW, tft.width(), TEXT_SIZE_1_HEIGHT, ST77XX_BLACK); // Korábbi adatok törlése
-            tft.setTextSize(1);
             tft.setCursor(0, TXT_PROGRAM_INFO_ROW);
             if (scrollPosition < strlen(prevProgramInfo) - TXT_PROGRAM_INFO_WIDTH) {
                 tft.print(prevProgramInfo + scrollPosition);
@@ -286,8 +286,7 @@ void displayData() {
             }
         } else {
             // Ha a szöveg rövidebb, mint a kijelző szélessége, ne görgessen
-            tft.fillRect(0, TXT_PROGRAM_INFO_ROW, tft.width(), TEXT_SIZE_1_HEIGHT, ST77XX_BLACK); // Korábbi adatok törlése
-            tft.setTextSize(1);
+            // tft.fillRect(0, TXT_PROGRAM_INFO_ROW, tft.width(), TEXT_SIZE_1_HEIGHT, ST77XX_BLACK); // Korábbi adatok törlése
             tft.setCursor(0, TXT_PROGRAM_INFO_ROW);
             tft.print(prevProgramInfo);
         }
@@ -394,7 +393,7 @@ void setup() {
 void loop() {
 
     static unsigned long prevDisplay = millis(); // Az aktuális idő lekérése
-    if (millis() - prevDisplay >= 250) {
+    if (millis() - prevDisplay >= 100) {
         displayData();
 
         //     Serial.printf("Date: %04d-%02d-%02d, Time: %02d:%02d:%02d\n\r",

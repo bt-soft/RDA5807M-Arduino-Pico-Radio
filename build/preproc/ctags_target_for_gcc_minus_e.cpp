@@ -231,6 +231,8 @@ void displayInit() {
 # 179 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 void displayData() {
 
+    tft.setTextSize(1);
+
 // RSSI érték kiírása
 
     int currentRssi = radio.getRssi();
@@ -275,9 +277,9 @@ void displayData() {
             tft.fillRect(0, 60, tft.width(), 16, 0x0000); // Korábbi adatok törlése
             prevStationName[0] = 0;
         } else if (pStationName != 
-# 224 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino" 3 4
+# 226 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino" 3 4
                                   __null 
-# 224 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
+# 226 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
                                        && strcmp(pStationName, prevStationName) != 0) {
             tft.fillRect(0, 60, tft.width(), 16, 0x0000); // Korábbi adatok törlése
             tft.setTextSize(2);
@@ -289,24 +291,22 @@ void displayData() {
 // ProgramInfo kiírása
 
 
+        tft.setTextSize(1);
         if (prevProgramInfo[0] == 255) {
             tft.fillRect(0, 80, tft.width(), 8, 0x0000); // Korábbi adatok törlése
             prevProgramInfo[0] = 0;
         } else if (pProgramInfo != 
-# 238 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino" 3 4
+# 241 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino" 3 4
                                   __null 
-# 238 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
+# 241 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
                                        && strcmp(pProgramInfo, prevProgramInfo) != 0) {
             tft.fillRect(0, 80, tft.width(), 8, 0x0000); // Korábbi adatok törlése
-            tft.setTextSize(1);
             tft.setCursor(0, 80);
             tft.print(pProgramInfo);
             strncpy(prevProgramInfo, pProgramInfo, sizeof(prevProgramInfo) - 1);
             scrollPosition = 0; // Reset scroll position when new info is received
         } else if (strlen(prevProgramInfo) > (tft.width() / 6)) {
             // Görgetés megvalósítása
-            tft.fillRect(0, 80, tft.width(), 8, 0x0000); // Korábbi adatok törlése
-            tft.setTextSize(1);
             tft.setCursor(0, 80);
             if (scrollPosition < strlen(prevProgramInfo) - (tft.width() / 6)) {
                 tft.print(prevProgramInfo + scrollPosition);
@@ -324,8 +324,7 @@ void displayData() {
             }
         } else {
             // Ha a szöveg rövidebb, mint a kijelző szélessége, ne görgessen
-            tft.fillRect(0, 80, tft.width(), 8, 0x0000); // Korábbi adatok törlése
-            tft.setTextSize(1);
+            // tft.fillRect(0, TXT_PROGRAM_INFO_ROW, tft.width(), TEXT_SIZE_1_HEIGHT, ST77XX_BLACK); // Korábbi adatok törlése
             tft.setCursor(0, 80);
             tft.print(prevProgramInfo);
         }
@@ -349,7 +348,7 @@ void displayData() {
  * Rotary encoder controller
 
  */
-# 289 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
+# 288 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 void rotaryController(RotaryEncoder::Button buttonState, RotaryEncoder::Direction direction) {
 
     switch (buttonState) {
@@ -386,7 +385,7 @@ void rotaryController(RotaryEncoder::Button buttonState, RotaryEncoder::Directio
  * Hardware timer interrupt service routine
 
  */
-# 323 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
+# 322 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 bool HardwareTimerHandler1(struct repeating_timer *t) {
     pRotaryEncoder->service();
     return true;
@@ -397,7 +396,7 @@ bool HardwareTimerHandler1(struct repeating_timer *t) {
  * Setup
 
  */
-# 331 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
+# 330 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 void setup() {
     Serial.begin(115200);
 
@@ -440,11 +439,11 @@ void setup() {
  * Loop
 
  */
-# 371 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
+# 370 "F:\\Elektro\\!Pico\\TFT-SPI\\RDA5807M-Arduino-Pico-Radio\\RDA5807M-Arduino-Pico-Radio.ino"
 void loop() {
 
     static unsigned long prevDisplay = millis(); // Az aktuális idő lekérése
-    if (millis() - prevDisplay >= 250) {
+    if (millis() - prevDisplay >= 100) {
         displayData();
 
         //     Serial.printf("Date: %04d-%02d-%02d, Time: %02d:%02d:%02d\n\r",
