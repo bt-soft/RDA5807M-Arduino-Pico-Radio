@@ -77,9 +77,6 @@ char prevProgramInfo[65] = "";
 char prevRdsTime[6] = "";
 int prevRdsProgramType = -1;
 
-// Görgetési pozíció tárolása
-int scrollPosition = 0;
-
 /**
  * Clear RDS information
  */
@@ -98,6 +95,17 @@ void clearRds() {
     prevRdsTime[0] = 255; // beállítjuk a tömb első elemét 255-re, hogy ezt mi töröltük
 
     prevRdsProgramType = -1;
+}
+
+/**
+ * Jobb oldali szóközök levágása a szövegből
+ */
+void trimRight(char *s) {
+    int i = strlen(s) - 1;
+    while (i >= 0 && isspace(s[i])) {
+        s[i] = '\0';
+        i--;
+    }
 }
 
 /**
@@ -131,6 +139,16 @@ void radioSeek() {
 /*********************************************************
    Display
  *********************************************************/
+
+/**
+ * Szöveg szélességének lekérdezése pixelben
+ */
+uint16_t getTextWidth(const char *text) {
+    int16_t x1, y1;
+    uint16_t w, h;
+    tft.getTextBounds(text, 0, 0, &x1, &y1, &w, &h);
+    return w;
+}
 
 /**
  * Frekvencia megjelenítése
@@ -237,39 +255,49 @@ void displayData() {
 
 // ProgramInfo kiírása
 #define TXT_PROGRAM_INFO_ROW 80
-#define TXT_PROGRAM_INFO_WIDTH (tft.width() / TEXT_SIZE_1_WIDTH)
+#define SCROLL_PIXEL 3
+        static int scrollPosition;
+        static uint16_t prevProgramInfoPixelWidth = 0;
+
         tft.setTextSize(1);
-        if (prevProgramInfo[0] == 255) {
+        tft.setCursor(0, TXT_PROGRAM_INFO_ROW);
+
+        if (prevProgramInfo[0] == 255) {                                                          // kézzel töröltük a program infót?
             tft.fillRect(0, TXT_PROGRAM_INFO_ROW, tft.width(), TEXT_SIZE_1_HEIGHT, ST77XX_BLACK); // Korábbi adatok törlése
             prevProgramInfo[0] = 0;
-        } else if (pProgramInfo != NULL && strcmp(pProgramInfo, prevProgramInfo) != 0) {
+
+        } else if (pProgramInfo != NULL && strcmp(pProgramInfo, prevProgramInfo) != 0) { // új adat jött?
+
             tft.fillRect(0, TXT_PROGRAM_INFO_ROW, tft.width(), TEXT_SIZE_1_HEIGHT, ST77XX_BLACK); // Korábbi adatok törlése
-            tft.setCursor(0, TXT_PROGRAM_INFO_ROW);
-            tft.print(pProgramInfo);
-            strncpy(prevProgramInfo, pProgramInfo, sizeof(prevProgramInfo) - 1);
-            scrollPosition = 0; // Reset scroll position when new info is received
-        } else if (strlen(prevProgramInfo) > TXT_PROGRAM_INFO_WIDTH) {
-            // Görgetés megvalósítása
-            tft.setCursor(0, TXT_PROGRAM_INFO_ROW);
-            if (scrollPosition < strlen(prevProgramInfo) + TXT_PROGRAM_INFO_WIDTH) {
-                if (scrollPosition < strlen(prevProgramInfo) - TXT_PROGRAM_INFO_WIDTH) {
-                    tft.print(prevProgramInfo + scrollPosition);
-                } else {
-                    // Szöveg úszása a jobb oldalról
-                    int offset = scrollPosition - (strlen(prevProgramInfo) - TXT_PROGRAM_INFO_WIDTH);
-                    tft.print(prevProgramInfo + offset);
-                    tft.setCursor(tft.width() - (offset * TEXT_SIZE_1_WIDTH), TXT_PROGRAM_INFO_ROW);
-                    tft.print(prevProgramInfo + offset);
-                }
-                scrollPosition++;
-                if (scrollPosition >= strlen(prevProgramInfo) + TXT_PROGRAM_INFO_WIDTH) {
-                    scrollPosition = 0; // Reset scroll position when end is reached
-                }
+            strncpy(prevProgramInfo, pProgramInfo, sizeof(prevProgramInfo) - 1);                  // Lemásoljuk az új adatot a régi adatba
+            trimRight(prevProgramInfo);                                                           // Jobb oldali szóközök levágása
+
+            // Új szöveg kiírása után a görgetési pozíció beállítása a képernyő végére
+            prevProgramInfoPixelWidth = getTextWidth(prevProgramInfo); // Szöveg méreteinek lekérdezése
+
+            // Ha a szöveg szélessége nagyobb, mint a kijelző szélessége, akkor elkezdjük a görgetést
+            if (prevProgramInfoPixelWidth > tft.width()) {
+                scrollPosition = SCROLL_PIXEL;
+            } else {
+                // Csak kiírjuk a szöveget, ha az nem nagyobb, mint a kijelző szélessége
+                tft.setCursor(0, TXT_PROGRAM_INFO_ROW);
+                tft.print(prevProgramInfo);
             }
-        } else {
-            // Ha a szöveg rövidebb, mint a kijelző szélessége, ne görgessen
-            // tft.fillRect(0, TXT_PROGRAM_INFO_ROW, tft.width(), TEXT_SIZE_1_HEIGHT, ST77XX_BLACK); // Korábbi adatok törlése
-            tft.setCursor(0, TXT_PROGRAM_INFO_ROW);
+        }
+
+        // Ha a szöveg szélessége nagyobb, mint a kijelző szélessége, akkor görgetünk
+        if (prevProgramInfo[0] != 0 && prevProgramInfoPixelWidth > tft.width()) {
+
+            // Görgetés balra
+            scrollPosition -= SCROLL_PIXEL;
+
+            // Ha a szöveg végére értünk, akkor jobbról kezdjük újra a görgetést
+            if (scrollPosition + prevProgramInfoPixelWidth < 0) {
+                tft.fillRect(0, TXT_PROGRAM_INFO_ROW, tft.width(), TEXT_SIZE_1_HEIGHT, ST77XX_BLACK); // Korábbi adatok törlése
+                scrollPosition = tft.width();                                                         // Újra kezdjük a görgetést jobb oldalról
+            }
+
+            tft.setCursor(scrollPosition, TXT_PROGRAM_INFO_ROW);
             tft.print(prevProgramInfo);
         }
 
@@ -337,7 +365,7 @@ void setup() {
 
     // TFT display inicializálása
     tft.initR(INITR_144GREENTAB); // Init ST7735R chip, green tab
-    tft.setTextWrap(false);
+    tft.setTextWrap(false);       // Az RDS szöveg görgetéséhez kell, hogy ne törje a sorokat
     // tft.setRotation(3);
     displayInit();
 
