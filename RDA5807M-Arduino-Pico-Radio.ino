@@ -1,3 +1,33 @@
+/**
+ * RDA5807M FM Radio with RDS, Ky-040 Rotary Encoder, ST7735 TFT Display and DS3231 RTC
+ *
+ * ST7735 TFT Display pinout
+ * LED: 3.3V
+ * SCLK: PICO SPI0 SCK (Pin 2)
+ * SDA: PICO SPI0 MOSI (Pin 3)
+ * A0: PICO GPIO4 (Pin 4)
+ * RESET: PICO GPIO5 (Pin 5)
+ * CS: PICO GPIO6 (Pin 6)
+ * GND: GND
+ * VCC: 3.3V
+ *
+ * RDA5807M pinout:
+ * GND: GND
+ * 3.3V: 3.3V
+ * SDA: PICO I2C1 SDA (Pin 0) - 3.3V-5V szintillesztővel csatlakoztatva!
+ * SCL: PICO I2C1 SCL (Pin 1)- 3.3V-5V szintillesztővel csatlakoztatva!
+ *
+ *
+ * Ky-040 Rotary Encoder pinout:
+ * CLK: PICO GPIO22 (Pin 22)
+ * DT: PICO GPIO21 (Pin 21)
+ * SW: PICO GPIO20 (Pin 20)
+ * +: 3.3V  (VCC)
+ * -: GND   (GND)
+ *
+ *
+ */
+
 //------------------- 1.44" TFT ST7735
 #include <Adafruit_GFX.h>    // Core graphics library
 #include <Adafruit_ST7735.h> // Hardware-specific library for ST7735
